@@ -1,9 +1,11 @@
 #pragma once
 
-#include "../Headers/ECMS.h"
-//FIXME:path
-#include "../Headers/tabulate.hpp"
-#include "../Headers/conio.h"
+#include "ECMS.h"
+#include "tabulate.hpp"
+#include "conio.h"
+#include <python3.10/Python.h>
+#define PY_SIZE_T_CLEAN
+
 
 using namespace tabulate;
 
@@ -199,7 +201,7 @@ int CustomerDetailsByIDHandler(int cust_id,string start_date, string end_date,EC
     else{
         //We get here if the customer does in fact exist;
         //We fill his info into the second row of the user info table
-        UserInfoTable.add_row({target_customer->GetCustomerName(),target_customer->GetCustomerAddress(),to_string(target_customer->GetFamilyMembersCount()),"AYA HAJA"});
+        UserInfoTable.add_row({target_customer->GetCustomerName(),target_customer->GetCustomerAddress(),to_string(target_customer->GetFamilyMembersCount()),target_customer->GetMinDate()});
         
         //Look for his record in the period
         vector<Record> records = target_customer->GetRecordsByPeriod(start_date,end_date);
@@ -232,12 +234,55 @@ int CustomerDetailsByIDHandler(int cust_id,string start_date, string end_date,EC
             auto measure_end = chrono::high_resolution_clock::now();
             double duration = chrono::duration_cast<chrono::duration<double>>(measure_end-measure_start).count();
             InfoTable.add_row({"Data Fetched In : " + to_string(duration) + " s"});
+
+            //This part handles data input into a csvfile being fed to a python plotter
+            vector<float> plot_data_injection;
+            vector<float> plot_data_consumption;
+            vector<float> plot_data_avg_temp;
+            string consumption_arg;
+            string injection_arg;
+            string avgtemp_arg;
+
             for(Record& record : records){
+
                 DataTable.add_row({record.getDateString(), to_string(record.GetInjection()), to_string(record.GetConsumption()), to_string(-record.GetNetCost()), record.GetDayWeather(), to_string(record.GetDayMinTemp()), to_string(record.GetDayMaxTemp())});
                 injection_sum += record.GetInjection();
                 consumption_sum += record.GetConsumption();
+                plot_data_consumption.push_back(record.GetConsumption());
+                plot_data_injection.push_back(record.GetInjection());
+                plot_data_avg_temp.push_back((record.GetDayMaxTemp()+record.GetDayMinTemp())/2);
+                consumption_sum += record.GetConsumption();
                 Amount -= record.GetNetCost();
             }
+            for (size_t i = 0; i < plot_data_consumption.size(); ++i) {
+                consumption_arg += std::to_string((int)plot_data_consumption[i]);
+                if (i < plot_data_consumption.size() - 1) {
+                    consumption_arg += ",";
+                }
+            }
+            for (size_t i = 0; i < plot_data_injection.size(); ++i) {
+                injection_arg += std::to_string((int)plot_data_injection[i]);
+                if (i < plot_data_injection.size() - 1) {
+                    injection_arg += ",";
+                }
+            }
+            for (size_t i = 0; i < plot_data_avg_temp.size(); ++i) {
+                avgtemp_arg += std::to_string((int)plot_data_avg_temp[i]);
+                if (i < plot_data_avg_temp.size() - 1) {
+                    avgtemp_arg += ",";
+                }
+            }
+            fstream python_file;
+            python_file.open("Scripts/customer_bill.csv",ios::out);
+        
+            if(python_file.is_open()){
+                python_file << injection_arg << endl << consumption_arg << endl << records[0].getDateString() << endl << target_customer->GetCustomerName() << endl << avgtemp_arg;
+                python_file.close();
+            }
+            //Here we execute the plotter in a new shell.
+            system("gnome-terminal -- python3 -u Scripts/customerbill.py");
+
+
             DataTable.add_row({"TOTAL >>>>", to_string(injection_sum), to_string(consumption_sum),to_string(Amount),"N/A","N/A","N/A"});
             DataTable.row(1+records.size()).format().font_color(Color::green);
             do{
@@ -716,9 +761,46 @@ int WinnerDepartmentDisplayHandler(ECMS* program,string year){
         DataTable.format().width(52);
         DataTable.add_row({"Department City", "Department Rank", "Year Profit"});
         int i = 1;
+        vector<int> depts_income;
+        vector<string> depts_names;
+
         for(auto& dept : depts){
-            DataTable.add_row({dept->city, to_string(i++),to_string(dept->GetYearlyRecord(year)->amount)});
+            if(dept->GetYearlyRecord(year)->amount != 0){
+                DataTable.add_row({dept->city, to_string(i++),to_string(dept->GetYearlyRecord(year)->amount)});
+                if(i <= 12){
+                depts_income.push_back(dept->GetYearlyRecord(year)->amount);
+                depts_names.push_back(dept->city);
+                }
+            }
+            
         }
+        if(i>1){
+        string depts_income_csv;
+        string depts_names_csv;
+        for (size_t i = 0; i < depts_income.size(); ++i) {
+            depts_income_csv += std::to_string(depts_income[i]);
+            if (i < depts_income.size() - 1) {
+                depts_income_csv += ",";
+            }
+        }
+        for (size_t i = 0; i < depts_names.size(); ++i) {
+            depts_names_csv += depts_names[i];
+            if (i < depts_names.size() - 1) {
+                depts_names_csv += ",";
+            }
+        }
+
+        fstream depts_plot_data;
+        depts_plot_data.open("Scripts/department_perf.csv",ios::out);
+
+        if(depts_plot_data.is_open()){
+            depts_plot_data << depts_income_csv << endl << depts_names_csv << endl << year;
+            depts_plot_data.close();
+        }
+        system("gnome-terminal -- python3 -u Scripts/departments_perf.py");
+
+    }
+
         auto measure_end = chrono::high_resolution_clock::now();
         double duration = chrono::duration_cast<chrono::duration<double>>(measure_end - measure_start).count();
         TitleTable.add_row({"Data Fetched in : "+ to_string(duration) + " s..."});

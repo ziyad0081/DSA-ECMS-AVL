@@ -2,7 +2,7 @@
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
-#include "../Headers/CustomerTree.h"
+#include "CustomerTree.h"
 //FIXME:path
 using namespace std;
 pair<TimePoint,TimePoint> GetDayPeriodFromMonth(string year_month) throw() {

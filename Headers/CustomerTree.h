@@ -28,16 +28,16 @@ class Customer
                 int GetFamilyMembersCount() const {
                     return family_members_count;
                 }
-                Record* GetHeadRecord() const{
-                    return customer_records.head_record;
-                }
                 int GetCustomerID() const { return account_id; }
                 Record* addRecord(int consomation, int injection, string date, string day_weather, int max_temp, int min_temp, int sunny_hours); //Adding a record into the customer's account;
                 Record* addRecord_(int consomation, int injection, string date, string day_weather, int max_temp, int min_temp, int sunny_hours); //Adding a record into the customer's account;
                 vector<Record> GetRecordsByPeriod(string start_date, string end_date) ; //Start and end dates will be passed as strings and parsed in the records tree.
                 float GetCumInjectionByMonth(string year_month) ; // This will return customer total injection by month specified in format YYYY/MM
                 float GetPaidAmountByYear(string year);
-
+                string GetMinDate(){
+                    auto rec = _customer_records.findMin();
+                    return rec.getDateString();
+                }
             private:
                 int unsigned account_id;
                 string customer_name;
@@ -45,7 +45,6 @@ class Customer
                 unsigned int family_members_count;
                 vector<unsigned int>family_ages;
                 vector<pair<string,float>> cumulative_inj;
-                RecordList customer_records;
                 AvlTree<Record> _customer_records;
 };
 #endif

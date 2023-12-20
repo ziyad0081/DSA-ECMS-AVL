@@ -68,12 +68,12 @@ class AvlTree
      * Find the smallest item in the tree.
      * Throw UnderflowException if empty.
      */
-    // const Comparable & findMin( ) const
-    // {
-    //     if( isEmpty( ) )
-    //         throw UnderflowException{ };
-    //     return findMin( root )->element;
-    // }
+    const Comparable & findMin( ) const
+    {
+        if( isEmpty( ) )
+            throw out_of_range("This should never happen");
+        return findMin( root )->element;
+    }
 
     /**
      * Find the largest item in the tree.
