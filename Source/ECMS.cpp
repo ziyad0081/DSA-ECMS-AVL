@@ -770,8 +770,8 @@ int WinnerDepartmentDisplayHandler(ECMS* program,string year){
                 depts_names.push_back(dept->city);
                 }
             }
-            
         }
+        auto measure_end = chrono::high_resolution_clock::now();
         if(i>1){
         string depts_income_csv;
         string depts_names_csv;
@@ -799,7 +799,7 @@ int WinnerDepartmentDisplayHandler(ECMS* program,string year){
 
     }
 
-        auto measure_end = chrono::high_resolution_clock::now();
+        
         double duration = chrono::duration_cast<chrono::duration<double>>(measure_end - measure_start).count();
         TitleTable.add_row({"Data Fetched in : "+ to_string(duration) + " s..."});
         do{
