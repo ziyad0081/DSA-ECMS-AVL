@@ -2,7 +2,7 @@
 CC = g++
 
 # Compiler flags
-CFLAGS = -std=c++11 -w
+CFLAGS = -std=c++11 -w 
 
 SRCDIR = Source
 INCDIR = Headers

@@ -62,7 +62,7 @@ class ECMS{
         vector<string> files = {"records_trim1.csv","records_trim2.csv","records_trim3.csv","records_trim4.csv"};
         vector<thread> threads;
         mutex mtx;
-        for(int i = 0; i < 1; i++){
+        for(int i = 0; i < 4; i++){
             threads.emplace_back([this,files,i,&mtx](){
                 this->LoadRecordsFromFiles(files[i],ref(mtx));
             });

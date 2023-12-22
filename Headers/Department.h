@@ -23,7 +23,7 @@ public:
     DeptRecord* GetYearlyRecord(string date_year){
         auto target_record = find_if(yearly_payment.begin(),yearly_payment.end(),[date_year](const DeptRecord* rec){
             return date_year == rec->year;
-        });
+        }); 
 
         if(target_record != yearly_payment.end()){
             return *target_record;
@@ -33,7 +33,6 @@ public:
             return *(yearly_payment.end()-1);
         }
     }
-    vector<DeptRecord*> yearly_budget;
     DistrictTree* department_districts;
     MarketingDepartment(string _city) : city(_city){
         department_districts = new DistrictTree();

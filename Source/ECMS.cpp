@@ -300,7 +300,7 @@ int LocationDataDisplayHandler(ECMS* program,string start_date, string end_date,
     //Where R is a region , C is a city and D is a district
     //This might be the function that is most prone to invalid arguments in the universe
     auto measure_start = chrono::high_resolution_clock::now();
-    vector<string> parsed_location;;
+    vector<string> parsed_location;
     string token;
     istringstream iss(location);
     while(getline(iss,token,',')){

@@ -1,4 +1,4 @@
-#ifndef REGION_Hclear
+#ifndef REGION_H
 #define REGION_H
 
 #include "Department.h"
@@ -36,7 +36,5 @@ public:
     Region* SearchRegion(string region_name);
     void DeleteRegion(string region_name);
     void PrintRegions(Region* root);
-    Customer* GetBestRegionCumInjUtil(Region* root, string year_month);
-    Customer* GetBestRegionCumInj(string year_month);
 };
 #endif
