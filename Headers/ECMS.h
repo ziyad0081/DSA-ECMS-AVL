@@ -111,17 +111,16 @@ CountryTree countries;
 MarketingDepartment *GetCustomerDept(const Customer &cust)
 {
     istringstream address(cust.GetCustomerAddress());
-    string dept;
+    string token;
     // The address is stored as "Region,Dept,District" so advancing
-    getline(address, dept, ',');
-    getline(address, dept, ',');
-
-    auto country_depts = countries.SearchCountry("Algeria")->country_departments;
-    auto target_dept = find_if(country_depts.begin(), country_depts.end(), [dept](MarketingDepartment *_dept)
-                               { return _dept->city == dept; });
-    return *target_dept;            
-        }
-        vector<MarketingDepartment*> GetSortedDeptsByYear(string year){ // Input format YYYY
+    getline(address, token, ',');
+    auto region = countries.SearchCountry("Algeria")->country_regions.SearchRegion(token);
+    getline(address, token, ',');
+    if(!region) return 0;
+    auto dept = region->GetDeptByCityName(token);
+    return dept;
+}
+vector<MarketingDepartment*> GetSortedDeptsByYear(string year){ // Input format YYYY
             // This function retrieves the country's departments and sorts them based on their annual customer income for a given year  
             auto algeria_depts = countries.SearchCountry("Algeria")->country_departments;
             sort(algeria_depts.begin(),algeria_depts.end(),[year](MarketingDepartment* a,MarketingDepartment* b){
