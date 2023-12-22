@@ -3,8 +3,6 @@
 #include "ECMS.h"
 #include "tabulate.hpp"
 #include "conio.h"
-#include <python3.10/Python.h>
-#define PY_SIZE_T_CLEAN
 
 
 using namespace tabulate;
