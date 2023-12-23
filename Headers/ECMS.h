@@ -112,7 +112,7 @@ MarketingDepartment *GetCustomerDept(const Customer &cust)
 {
     istringstream address(cust.GetCustomerAddress());
     string token;
-    // The address is stored as "Region,Dept,District" so advancing
+    // The address is stored as "Region,Dept,District" so advancing once for the region then again for the dept within the region
     getline(address, token, ',');
     auto region = countries.SearchCountry("Algeria")->country_regions.SearchRegion(token);
     getline(address, token, ',');
@@ -127,7 +127,7 @@ vector<MarketingDepartment*> GetSortedDeptsByYear(string year){ // Input format 
                 return a->GetYearlyRecord(year) > b->GetYearlyRecord(year);
             });
             return algeria_depts;
-        }
+}
         
 };
 
